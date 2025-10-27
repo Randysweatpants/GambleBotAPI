@@ -49,3 +49,15 @@ replit.md - Project documentation
 - Initial project setup (Oct 27, 2025)
 - Discord integration configured
 - Core EV calculation engine implemented
+- Added README.md with setup instructions
+- Configured workflow to run Discord bot
+
+## Setup Required
+⚠️ **Important**: You must enable "Message Content Intent" in the Discord Developer Portal for the bot to work:
+1. Go to https://discord.com/developers/applications
+2. Select your application
+3. Go to Bot → Privileged Gateway Intents
+4. Enable "MESSAGE CONTENT INTENT"
+5. Save changes and restart the bot workflow
+
+See README.md for complete setup instructions.

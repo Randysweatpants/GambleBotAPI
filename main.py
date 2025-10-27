@@ -211,7 +211,7 @@ def build_parlays(cands: List[Dict[str, Any]], max_legs: int, min_ev: float, sam
     combos = []
     pool = legs
 
-    sizes = [2, 3] if max_legs <= 3 else [2, 3, 4]
+    sizes = list(range(2, min(max_legs, 4) + 1))
     for r in sizes:
         for comb in itertools.combinations(pool, r):
             gset = {x["game_id"] for x in comb}
