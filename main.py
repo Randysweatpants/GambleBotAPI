@@ -1,20 +1,27 @@
+# main.py
 import os
 from typing import Optional, List
 from fastapi import FastAPI, Header, HTTPException
 
 app = FastAPI(title="EV Parlay Service", version="1.0.0")
 
-API_KEY = os.getenv("X_API_KEY")  # set this in Render → Settings → Environment
+# === Auth (header key set in Render Settings → Environment: X_API_KEY) ===
+API_KEY = os.getenv("X_API_KEY")  # optional; enforced only if set
 
 def require_key(x_api_key: Optional[str]):
-    # If you haven't set X_API_KEY yet, allow all (for first boot). Once set, enforce.
     if API_KEY and x_api_key != API_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-@app.get("/healthz")
+# === Public routes (no auth) ===
+@app.get("/", include_in_schema=False)
+def root():
+    return {"status": "ok", "health": "/healthz", "docs": "/docs"}
+
+@app.get("/healthz", include_in_schema=False)
 def healthz():
     return {"ok": True}
 
+# === Protected routes (require X-API-Key if configured) ===
 @app.get("/odds")
 def get_odds(
     sport: str,
@@ -23,7 +30,7 @@ def get_odds(
     x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
 ):
     require_key(x_api_key)
-    # Stub payload; replace with real odds later
+    # TODO: replace with real odds fetching + de-vig
     return {"games": []}
 
 @app.post("/ev_parlays")
@@ -31,7 +38,7 @@ def ev_parlays(
     x_api_key: Optional[str] = Header(None, alias="X-API-Key")
 ):
     require_key(x_api_key)
-    # Stub payload; replace with your EV logic
+    # TODO: replace with real EV logic
     return {"parlays": []}
 
 @app.post("/log_result")
@@ -39,4 +46,6 @@ def log_result(
     x_api_key: Optional[str] = Header(None, alias="X-API-Key")
 ):
     require_key(x_api_key)
+    # TODO: persist results for learning
     return {"ok": True}
+
