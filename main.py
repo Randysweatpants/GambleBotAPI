@@ -22,16 +22,32 @@ def healthz():
     return {"ok": True}
 
 # === Protected routes (require X-API-Key if configured) ===
+from fastapi import FastAPI, Header, HTTPException, Query
+from typing import Optional
+import os
+
+# (Keep the app and require_key you already had)
+app = FastAPI(title="EV Parlay Service", version="1.0.0")
+API_KEY = os.getenv("X_API_KEY")
+
+def require_key(x_api_key: Optional[str]):
+    if API_KEY and x_api_key != API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
 @app.get("/odds")
 def get_odds(
-    sport: str,
-    window_minutes: int = 240,
-    books: Optional[List[str]] = None,
+    sport: str = Query(..., description="NHL|NBA|NFL"),
+    window_minutes: int = Query(240, description="Lookahead window in minutes"),
+    books: Optional[str] = Query(
+        None,
+        description="Comma-separated books, e.g. FD,DK,MGM"
+    ),
     x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
 ):
     require_key(x_api_key)
-    # TODO: replace with real odds fetching + de-vig
-    return {"games": []}
+    book_list = [b.strip() for b in books.split(",")] if books else None
+    # Placeholder response — you'll later call The Odds API here
+    return {"sport": sport, "window_minutes": window_minutes, "books": book_list, "games": []}
 
 @app.post("/ev_parlays")
 def ev_parlays(
