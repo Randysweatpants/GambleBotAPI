@@ -48,4 +48,20 @@ def log_result(
     require_key(x_api_key)
     # TODO: persist results for learning
     return {"ok": True}
+from fastapi.openapi.utils import get_openapi
 
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        description="EV Parlay Service API",
+        routes=app.routes,
+    )
+    # 👇 Tell clients the canonical HTTPS base URL
+    schema["servers"] = [{"url": "https://gamblebotapi.onrender.com"}]
+    app.openapi_schema = schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi  # <-- register override
